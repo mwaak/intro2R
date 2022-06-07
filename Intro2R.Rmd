@@ -1,0 +1,360 @@
+---
+title: Introduction to R
+subtitle: Using R for data science, statistics and creation of publishable figures
+author: "Michael B. Waak"
+date: '2022-06-07'
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+tools::Rd2txt_options(underline_titles = FALSE, width = 75)
+```
+
+# Intro to R
+## Getting Started
+### Packages
+Out of the box, R has various packages that are always pre-loaded when you start a session of R. These comprise "base" R, and these are actively developed by the R Foundation. A lot can be done with base R, but there are thousands of packages created by third parties that add, alter, or otherwise enhance the functionality of R. These are available for download from many sources ('repositories'), the most common being CRAN, GitHub and Bioconductor. These must be installed separately from R (installed within an active session of R, and then perpetually available thereafter). Although installed, they must be loaded within each new session of R (but only once per session). In other words, third-party packages are not automatically loaded when you start R, so so you must activate them to use them. It is not resource efficient (on a computer) to have all packages loaded and ready to go at all times, so it makes sense to only activate packages you need when you need them. This is a common practice in many programming languages.
+
+### Help
+By the way, preceding any command with `?` in the Console will allow you to view the support documentation for the command (or package), including possible arguments to the command as well as examples. This is <b>really</b> helpful.
+
+```{r help, exercise=TRUE}
+?library
+```
+
+### Installation of packages
+
+Packages are only available if they have been installed. Packages can be installed (and subsequently updated) from the `Packages` tab or directly in the Console using `install.packages('package_name')` (for CRAN packages; GitHub and Bioconductor packages are installed differently).
+
+```{r install_tidyverse, eval=FALSE}
+install.packages("tidyverse")
+```
+
+This tutorial has already installed the necessary packages. To load the package within a session of R, we use `library('package_name')`.
+
+The `tidyverse` family of packages are some of the most useful and elegant packages for R. The core tidyverse packages can be loaded simultaneously:
+
+```{r load_tidyverse, message=FALSE, eval=TRUE}
+library("tidyverse")
+library("lubridate")
+```
+
+Another helpful Tidyverse package (not loaded with the above code) is `lubridate` (you may need to install it separately).
+
+
+## Working with data
+### Data objects and types
+Data objects and data values have several different types/formats and are stored within the R <i>environment</i> (visible in RStudio under the <i>Environment</i> tab). 
+
+Data objects include matrices, vectors, lists, and data frames. Tidyverse introduces the tibble, which is a modified kind of data frame.
+
+Data value types include strings of characters (text), integers, double-precision values ('double'), and factors. Dates and times can also be stored natively in R, though the `lubridate` package is a really helpful package for enhancing R's date/time functionality.
+
+First, to explore these, we need data.
+
+Base R and many packages have built-in datasets for practicing R and replicating example code. These are helpful also for inspecting the expected data structures, arguments and code syntax. To explore the many options:
+
+```{r view_data, exercise=TRUE}
+data()
+```
+
+These can be attached to the current R environment using (for example):
+
+```{r load_data_InsectSprays, exercise=TRUE}
+data(InsectSprays)
+```
+
+View the data (in another tab, via `View()`):
+
+```{r View_data_InsectSprays, exercise=TRUE}
+View(InsectSprays)
+```
+
+View just the first 5 entries (in the Console, via `head()`):
+
+```{r head_data_InsectSprays, exercise=TRUE}
+head(InsectSprays)
+```
+
+You'll notice that `head()` also prints the data types under the column headers, double (`<dbl>`) and factor (`<fct>`) for `count` and `spray` above. Row indices are printed to the left-hand side. These tidbits of info are introduced by the Tidyverse `tibble()` object (an example of the enhanced functionality); data frames in base R do not normally make it so clear for you.
+
+What are these data? Use the help function!
+```{r help_InsectSprays, exercise=TRUE}
+?InsectSprays
+```
+
+### Working directory
+
+You probably want to interact with data from outside R (i.e., your own data). You may also wish to export objects from R (data sets, plots/figures, etc.). This can be done with a working directory.
+
+To see the current working directory:
+
+```{r getwd, exercise=TRUE}
+getwd()
+```
+
+To change the current working directory (this usually requires the full path for the folder):
+
+```{r setwd, eval=FALSE}
+setwd("~/Documents/Tutorials")
+```
+Note regarding quotes: Single (`'`) and double quotes (`"`) delimit character constants. They can be used interchangeably but double quotes are preferred (and character constants are printed using double quotes), so single quotes are normally only used to delimit character constants containing double quotes (e.g., `'He said, "Hello!"'`).
+
+### Exporting data to CSV or Excel
+
+It's important to realize that many things in R can be done more than one way, especially with the added functionality of packages. There may be no perfect way, so it comes to personal preference. Personally, I tend to use Tidyverse over base R when possible (for example).
+
+Before we import data, let's export something (which we will re-import in subsequent steps). This can be done with the `write.*()` commands from base R or `write_*()` commands from the Tidyverse `readr` package (where `*` is a file type; there are several options). Common non-Excel file formats are <b>Comma-Separated Value</b> files (`.csv`) and <b>tab-delimited text</b> files (`.txt`). Base R cannot natively create Excel workbooks (`.xlsx`), but the Tidyverse package `readxl` provides support for this. 
+
+By the way, we can annotate code with comments by preceding the comment with `#`. You'll notice comments in the code throughout this tutorial. R does not execute commented code, so if you wish to 'deactivate' code without deleting it, you can simply 'comment it out'. The shortcut to toggle commets is `Control + Shift + c` in Windows and `Command + Shift + c` on MacOS. Try it here:
+```{r comment_out, exercise=TRUE}
+print("Hello world!")
+# print("Good bye world!")
+```
+
+
+Exporting data with base R:
+```{r write_CSV, eval=FALSE}
+# Base R
+write.csv(InsectSprays, "InsectSprays.csv", row.names = FALSE)
+
+# Readr (Tidyverse)
+write_csv(InsectSprays, "InsectSprays.csv") 
+write_excel_csv(InsectSprays, "InsectSprays.csv") # UTF-8 encoded for Excel
+```
+
+If not specified, the file will be saved in the working directory (by default). Otherwise the explicit path can be specified (if the intended location differs from the current working directory). For example:
+
+`"~/Documents/Tutorial/InsectSprays.csv"`
+
+<b>csv <i>vs.</i> csv2</b>: `csv` uses a dot/period for decimal point and comma to separate items by column within a row. In contrast, `csv2`  uses a comma for the decimal point and a semicolon for the separator, which is the convention in some Western European locales (including Norway!).
+
+```{r write_CSV2, eval=FALSE}
+write.csv2(InsectSprays, "InsectSprays.csv", row.names = FALSE) 
+write_csv2(InsectSprays, "InsectSprays.csv") 
+write_excel_csv2(InsectSprays, "InsectSprays.csv")
+```
+
+### Style guides and specifying commands from packages
+By the way, you can use functions from third-party packages without loading the entire package using two colons (`::`), as in `package_name::function_name()`. From now on, I will specify all non-base R packages with this prefix to clarify which package is providing the function. This is useful for coders to identify where commands come from (and recommended by the <a href=https://google.github.io/styleguide/Rguide.html>Google style guide</a>, which is based on the <a href="https://style.tidyverse.org/">Tidyverse style guide</a>). However, specifying the package is <b>unnecessary for executing code if the package is already loaded</b>.
+
+You may also wish to specify a specific command whose namespace is used by more than one available package ('namespace' is just the name for a function/command). With so many third party packages, it was only inevitable that the same namespaces were used by different parties. When these conflict, normally the command from the most recently loaded package will be called preferentially (if no package is specified); the command used may not be the command you intended, so specifying the package of origin can help avoid this issue. An example of a command whose namespace is used by several packages is the `filter` command (used by `stats` and `dplyr` packages):
+
+```{r help_filter_dplyr, exercise=TRUE}
+?dplyr::filter
+```
+
+```{r help_filter_stats, exercise=TRUE}
+?stats::filter
+```
+
+### Loading data from CSV
+To import data into R, you can use the <i>Import Dataset</i> tool under the <i>Environment</i> tab in RStudio, or you can use the Console. For CSV files, you can use either `read.csv` (base R) or `read_csv` (`readr`).
+
+You will need to import the data into a named variable (otherwise, the file will be printed in the Console but <b>not</b> saved in the R environment). This can be done with either `<-` or `=`, but `<-` is generally preferred. Unless the path is explicitly specified, R will search the current working directory for the file.
+
+```{r read_csv1, eval=FALSE}
+# Base R
+InsectSprays <- read.csv("InsectSprays.csv")
+
+# readr (Tidyverse) for csv2 (Norwegian)
+InsectSprays <- readr::read_csv2("InsectSprays.csv")
+```
+
+To read csv2-type files (comma as decimal separator):
+```{r read_csv2, eval=FALSE}
+# Base R
+InsectSprays <- read.csv("InsectSprays.csv", sep=";")
+
+# readr (Tidyverse)
+InsectSprays <- readr::read_csv2("InsectSprays.csv")
+```
+
+### Working with MS Excel
+Base R does not work with Excel files (`.xls` or `.xlsx`), so additional packages are needed to either read or write Excel files.
+
+Writing Excel files requires installation of any of several third-party packages. Here, I use the `writexl` package, which can be installed via GitHub (remember: installation only needs to be done once).
+```{r install_writexl, eval=FALSE}
+remotes::install_github("ropensci/writexl")
+```
+
+Writing an Excel file is straightforward. Providing a list of named data objects will create multiple worksheets in the Excel workbook (one sheet per object). You may also specify the sheet names explicitly (otherwise, sheets are named "Sheet1", "Sheet2", etc. by default). Notice that if you wish to create a namespace in R that includes a space, the entire name must be enclosed in a pair of \` marks. This tells R that any space(s) are part of the name and intentional.
+```{r writexl_write, eval=FALSE}
+data("InsectSprays")
+data("BOD")
+
+# Example 1 (simple)
+writexl::write_xlsx(InsectSprays, "myexcel_1.xlsx")
+
+# Example 2 (multiple sheets with spaces in names)
+writexl::write_xlsx(list(`Sheet 1` = InsectSprays,
+                         `Sheet 2` = BOD),
+                    "myexcel_2.xlsx")
+```
+
+
+Reading Excel files is easy with `readxl`. Only 1 sheet can be imported into the Environment at a time (by default, the first sheet, unless explicitly specified):
+```{r readxl_read, eval=FALSE}
+InsectSprays <- readxl::read_excel("myexcel_1.xlsx")
+
+BOD <- readxl::read_excel("myexcel_2.xlsx", sheet = "Sheet 2")
+```
+
+## Plotting with ggplot2
+Plotting can be performed with base R, and this is sometimes necessary or convenient. For the majority of cases, however, I recommend using ggplot2. This package uses the 'grammar of graphics'.
+
+An example of plotting with base R:
+```{r base_plot, exercise=TRUE}
+boxplot(count ~ spray, data = InsectSprays,
+        xlab = "Type of spray", ylab = "Insect count",
+        main = "InsectSprays data", varwidth = TRUE, col = "lightgray")
+```
+
+With ggplot2, a graphical space is created with `ggplot`, and then graphics are added with `geom_*` code. Every graphical layer is built onto the previous layer using a plus sign (`+`). Within ggplot2, 'aesthetics' that correspond to a column in the data are specified within the `aes()` argument. Available aesthetics may include the `x` and `y` axes as well as `color`, `fill`, `shape`, `size`, `alpha`, `linetype`, etc.) Example:
+
+```{r ggplot_plot, exercise=TRUE}
+ggplot2::ggplot(data = InsectSprays,
+                aes(x = spray, y = count)) +
+  ggplot2::geom_boxplot(stat = "boxplot")
+```
+
+
+If the plot is stored in a variable, layers can be added to the variable.
+```{r ggplot_plot2, exercise=TRUE}
+plot.1 <- ggplot2::ggplot(data = InsectSprays,
+                          ggplot2::aes(x = spray, 
+                              y = count,
+                              color = spray,
+                              fill = spray)) +
+  ggplot2::geom_boxplot(alpha = 0.5, stat = "boxplot") + 
+  ggplot2::labs(x = "Type of spray",
+              y = "Insect count") +
+  ggplot2::ggtitle("InsectSprays data") +
+  ggplot2::theme(plot.title = element_text(face = "bold",
+                                           size = 14),
+                 axis.title = element_text(face = "bold",
+                                           size = 11))
+
+plot.1 + ggplot2::theme_bw()
+```
+
+You can save a plot into several image types using `ggsave`:
+```{r ggplot_plot2_save, eval=FALSE}
+ggplot2::ggsave(
+  "insect_sprays.png",
+  plot.1,
+  device = "png",
+  width = 15,
+  height = 10,
+  units = "cm",
+  dpi = 300
+)
+```
+The available devices to use are "eps", "ps", "tex" (pictex), "pdf", "jpeg", "tiff", "png", "bmp", "svg" or "wmf" (Windows only). 
+
+I recommend png for inserting into Microsoft Office (Word, PowerPoint) and PDF for basically anything else. PDF, EPS and TIFF are common formats requested by publishers of peer-reviewed journals. Generally, vector-based images like PDF or EPS are compact files (on the order of kilobytes, KB) with high resolution (no pixels are used), while TIFF and other raster images (comprised of pixels) can have poor resolution if manually enlarged and may take up a lot more storage (on the order of megabytes, MB).
+
+```{r ggplot_plot3, exercise=TRUE}
+ggplot2::ggplot() +
+  ggplot2::geom_path(data = BOD, aes(x = Time, y = demand)) +
+  scale_x_continuous(breaks = seq(from = 0, to = 8, by = 2),
+                     expand = expansion(mult = 0, add = 0),
+                     limits = c(0, 8)) +
+  scale_y_continuous(breaks = seq(from = 0, to = 20, by = 5),
+                     expand = expansion(mult = 0, add = 0),
+                     limits = c(0, 20),
+                     labels = scales::label_number(accuracy = 0.1,
+                                                   decimal.mark = ",")) +
+  labs(x = "Time [days]",
+       y = "Demand [mg/l]") +
+  ggtitle("Biochemical oxygen demand (BOD)") +
+  theme_bw()
+```
+
+
+## Statistics
+Statistics is where R really excels over other programs or coding languages. R was built by statisticians for statistics.
+
+First, I would like to introduce the pipe operator `%>%` for performing pipelines; this is added to R using the `magrittr` package. The operator takes any object you supply to it and pushes it forward into the next operation. You can string together multiple operations to form a pipeline. Paired with the Tidyverse (esp. the `dplyr` package), this is really powerful. 
+```{r load_magrittr}
+library("magrittr")
+```
+
+R is capable of ANOVA and other tests, but `rstatix` enhances the base functions and makes them compatible with the pipe operator. We need to make sure `rstatix` is installed and loaded.
+
+```{r load_rstatix}
+library("rstatix")
+```
+
+When working with data, it's good to inspect the data object with `heaad()` to become familiar with the data structure.
+```{r pipeline_head, exercise=TRUE}
+data(InsectSprays)
+
+head(InsectSprays)
+```
+
+Next, let's summarize Insect Sprays dataset into a new data frame that supplies the mean, standard deviation, number of observations (<i>n</i>) min., max., and median of insect counts for each spray.
+```{r pipeline_summary, exercise=TRUE}
+InsectSprays %>% 
+  dplyr::group_by(spray) %>% 
+  dplyr::summarise(Average = mean(count),
+                   SD = sd(count),
+                   Count = dplyr::n(),
+                   Min = min(count),
+                   Max = max(count),
+                   Median = median(count))
+```
+
+`rstatix` actually has a built-in function to do the above (and more).
+```{r rstatix_summary, exercise=TRUE}
+InsectSprays %>% 
+  dplyr::group_by(spray) %>% 
+  rstatix::get_summary_stats()
+```
+
+Now, let's perform an Analysis of Variance (ANOVA) to statistically compare the insect sprays. We fit a linear model (function `lm()`), and after pointing the function to the data, we can write the columns as a formula, formatted like `y ~ x` (equivalent to telling R to 'model <i>y</i> as a function of <i>x</i>').
+
+First, fit the model and inspect it.
+```{r pipeline_lm_summary}
+lm(data = InsectSprays,
+            count ~ spray) %>% 
+  summary()
+```
+
+Next, perform ANOVA.
+```{r pipeline_lm_anova, exercise=TRUE}
+InsectSprays %>% 
+  rstatix::anova_test(count ~ spray)
+```
+
+Based on earlier inspection of the data (plots as wells as summary statistics), we may be concerned about the underlying assumption that the variances are homogeneous/equal. We can test this assumption with Levene's test.
+```{r pipeline_lm_levene, exercise=TRUE}
+InsectSprays %>% 
+  rstatix::levene_test(count ~ spray)
+```
+
+We reject the null hypothesis of equal group variances, so we should probably re-do the ANOVA without this assumption. The Welch ANOVA is an appropriate alternative.
+
+```{r pipeline_lm_welch_anova, exercise=TRUE}
+InsectSprays %>% 
+  rstatix::welch_anova_test(count ~ spray)
+```
+
+The Welch ANOVA is significant, so we can perform post hoc tests to identify <i>where</i> the between-group differences are. Due to the problem of multiplicity when we use a defined significance threshold (i.e., $p = 0.05$), these methods adjust the <i>p</i> values to control for the risk of Type I errors.
+
+We have options for post hoc testing, but we need to know some statistical theory to choose the best option for our data. If the groups had reasonably equal variances, we could have used the Tukey's Honest Significant Difference (HSD) test (the following is only provided for teaching). 
+```{r pipeline_lm_tukey_hsd, exercise=TRUE}
+InsectSprays %>%
+  rstatix::tukey_hsd(count ~ spray)
+```
+
+Since we already determined that the data contain unequal variances, however, a more appropriate test for post hoc testing may be the Games-Howell test.
+
+```{r pipeline_lm_games_howell, exercise=TRUE}
+InsectSprays %>% 
+  rstatix::games_howell_test(count ~ spray)
+```
+
+Remember, for all code, reading the help documentation (e.g., `?games_howell_test`) is helpful for determining the arguments and expected data structure as well as viewing example code and a description.
