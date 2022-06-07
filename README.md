@@ -21,7 +21,10 @@ devtools::install_github("mwaak/intro2R")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+To run the tutorial in your local web browser, you can run the following
+code in the R Console. This will open the tutorial, which will also
+interact with RStudio. I recommend having both the tutorial and RStudio
+windows visible side-by-side.
 
 ``` r
 library(intro2R)
