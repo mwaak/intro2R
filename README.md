@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of intro2R is to …
+The goal of intro2R is to introduce new users to R and the Tidyverse.
 
 ## Installation
 
