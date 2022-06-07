@@ -108,7 +108,7 @@ It's important to realize that many things in R can be done more than one way, e
 
 Before we import data, let's export something (which we will re-import in subsequent steps). This can be done with the `write.*()` commands from base R or `write_*()` commands from the Tidyverse `readr` package (where `*` is a file type; there are several options). Common non-Excel file formats are <b>Comma-Separated Value</b> files (`.csv`) and <b>tab-delimited text</b> files (`.txt`). Base R cannot natively create Excel workbooks (`.xlsx`), but the Tidyverse package `readxl` provides support for this. 
 
-By the way, we can annotate code with comments by preceding the comment with `#`. You'll notice comments in the code throughout this tutorial. R does not execute commented code, so if you wish to 'deactivate' code without deleting it, you can simply 'comment it out'. The shortcut to toggle commets is `Control + Shift + c` in Windows and `Command + Shift + c` on MacOS. Try it here:
+By the way, we can annotate code with comments by preceding the comment with `#`. You'll notice comments in the code throughout this tutorial. R does not execute commented code, so if you wish to 'deactivate' code without deleting it, you can simply 'comment it out'. The shortcut to toggle comments is `Control + Shift + c` in Windows and `Command + Shift + c` on MacOS (NOTE: This keyboard shortcut only works in RStudio---not within the tutorial). You can still try commenting/uncommenting here:
 ```{r comment_out, exercise=TRUE}
 print("Hello world!")
 # print("Good bye world!")
